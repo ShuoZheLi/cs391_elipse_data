@@ -1,7 +1,7 @@
 from turtle import circle
 import numpy as np
 import cv2
-import math 
+import math
 
 image = np.zeros((500, 500, 3), np.uint8)
 
@@ -28,8 +28,8 @@ thickness = -1
 
 
 # image = cv2.ellipse(
-    # image, center_coordinates, axesLength, angle, startAngle, endAngle, color, thickness
-    # image, (0, 0), axesLength, angle, startAngle, endAngle, color, thickness
+# image, center_coordinates, axesLength, angle, startAngle, endAngle, color, thickness
+# image, (0, 0), axesLength, angle, startAngle, endAngle, color, thickness
 # )
 
 
@@ -37,12 +37,10 @@ thickness = -1
 # image = cv2.circle(image, (0, 0), 50, (0, 255, 0), thickness)
 
 
-
-
 ellip_pos = []
-for x in range(100,400):
-    for y in range(100,400):
-        ellip_pos.append((x,y))
+for x in range(100, 400, 10):
+    for y in range(100, 400, 10):
+        ellip_pos.append((x, y))
         # cv2.imshow(window_name, image)
         # cv2.waitKey()
         # image = np.zeros((500, 500, 3), np.uint8)
@@ -53,7 +51,7 @@ for x in range(100,400):
 #         circle_pos.append((x,y))
 
 degree = []
-for deg in range(359):
+for deg in range(0, 359, 5):
     degree.append(deg)
 
 # math.tan(a)
@@ -70,39 +68,57 @@ for e_pos in ellip_pos:
     for angle in degree:
         image = np.zeros((500, 500, 3), np.uint8)
         image = cv2.ellipse(
-                image, e_pos, axesLength, angle, startAngle, endAngle, color, thickness
-            )
+            image, e_pos, axesLength, angle, startAngle, endAngle, color, thickness
+        )
         img_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         contours, _ = cv2.findContours(img_gray, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
         for c in contours:
             rect = cv2.boundingRect(c)
-            x,y,w,h = rect
-            ellip_bbox.append((e_pos[0],e_pos[1], w/2, h/2))
+            x, y, w, h = rect
+            ellip_bbox.append((e_pos[0], e_pos[1], w / 2, h / 2))
             # image = cv2.rectangle(
-            #     image, 
-            #     (int(e_pos[0]-w/2), int(e_pos[1]-h/2)), 
-            #     (int(e_pos[0]+w/2), int(e_pos[1]+h/2)), 
+            #     image,
+            #     (int(e_pos[0]-w/2), int(e_pos[1]-h/2)),
+            #     (int(e_pos[0]+w/2), int(e_pos[1]+h/2)),
             #     color, thickness = 2)
             # print(e_pos[0],e_pos[1],w/2,h/2)
-            obs_box_pos = []
-            for x in range(int(e_pos[0]-w/2), int(e_pos[0]+w/2),10):
-                for y in range(int(e_pos[1]-h/2), int(e_pos[1]+h/2),10):
-                    image = np.zeros((500, 500, 3), np.uint8)
-                    image = cv2.ellipse(
-                        image, e_pos, axesLength, angle, startAngle, endAngle, color, thickness
-                        )
-                    image = cv2.rectangle(
-                        image, 
-                        (int(x - 20), int(y - 20)), 
-                        (int(x + 20), int(y + 20)), 
-                        color, thickness = 2)
-                    cv2.imshow(window_name, image)
-                    cv2.waitKey()
-                    
-        
-        # cv2.imshow(window_name, image)
-        # cv2.waitKey()
+            obs_box_pos_list = []
+            for x in range(int(e_pos[0] - w / 2), int(e_pos[0] + w / 2), 10):
+                for y in range(int(e_pos[1] - h / 2), int(e_pos[1] + h / 2), 10):
+                    obs_box_pos_list.append((x, y))
 
+            for index in range(len(obs_box_pos_list)):
+                image_end = np.copy(image)
+                image_end = cv2.rectangle(
+                    image_end,
+                    (
+                        int(
+                            obs_box_pos_list[len(obs_box_pos_list) - 1 - index][0] - 40
+                        ),
+                        int(
+                            obs_box_pos_list[len(obs_box_pos_list) - 1 - index][1] - 40
+                        ),
+                    ),
+                    (
+                        int(
+                            obs_box_pos_list[len(obs_box_pos_list) - 1 - index][0] + 40
+                        ),
+                        int(
+                            obs_box_pos_list[len(obs_box_pos_list) - 1 - index][1] + 40
+                        ),
+                    ),
+                    color,
+                    thickness=2,
+                )
 
+                image_end = cv2.circle(
+                    image_end,
+                    (obs_box_pos_list[index][0], obs_box_pos_list[index][1]),
+                    40,
+                    color,
+                    thickness=2,
+                )
 
-
+                print(e_pos[0], e_pos[1], w / 2, h / 2)
+                cv2.imshow(window_name, image_end)
+                cv2.waitKey()
