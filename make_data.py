@@ -3,7 +3,12 @@ import numpy as np
 import cv2
 import math
 
-image = np.zeros((500, 500, 3), np.uint8)
+
+image_width = 500
+image_height = 500
+
+
+image = np.zeros((image_width, image_height, 3), np.uint8)
 
 window_name = "Image"
 
@@ -18,7 +23,8 @@ startAngle = 0
 endAngle = 360
 
 # Blue color in BGR
-color = (255, 0, 0)
+# color = (255, 0, 0)
+color = (255, 255, 255)
 
 # Line thickness of -1 px
 thickness = -1
@@ -38,8 +44,8 @@ thickness = -1
 
 
 ellip_pos = []
-for x in range(100, 400, 10):
-    for y in range(100, 400, 10):
+for x in range(100, image_width - 100, 100):
+    for y in range(100, image_height - 100, 100):
         ellip_pos.append((x, y))
         # cv2.imshow(window_name, image)
         # cv2.waitKey()
@@ -51,7 +57,7 @@ for x in range(100, 400, 10):
 #         circle_pos.append((x,y))
 
 degree = []
-for deg in range(0, 359, 5):
+for deg in range(0, 359, 10):
     degree.append(deg)
 
 # math.tan(a)
@@ -62,6 +68,8 @@ img_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 contours, _ = cv2.findContours(img_gray, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
 # print(contours)
+
+count = 0
 
 ellip_bbox = []
 for e_pos in ellip_pos:
@@ -76,15 +84,9 @@ for e_pos in ellip_pos:
             rect = cv2.boundingRect(c)
             x, y, w, h = rect
             ellip_bbox.append((e_pos[0], e_pos[1], w / 2, h / 2))
-            # image = cv2.rectangle(
-            #     image,
-            #     (int(e_pos[0]-w/2), int(e_pos[1]-h/2)),
-            #     (int(e_pos[0]+w/2), int(e_pos[1]+h/2)),
-            #     color, thickness = 2)
-            # print(e_pos[0],e_pos[1],w/2,h/2)
             obs_box_pos_list = []
-            for x in range(int(e_pos[0] - w / 2), int(e_pos[0] + w / 2), 10):
-                for y in range(int(e_pos[1] - h / 2), int(e_pos[1] + h / 2), 10):
+            for x in range(int(e_pos[0] - w / 2), int(e_pos[0] + w / 2), 50):
+                for y in range(int(e_pos[1] - h / 2), int(e_pos[1] + h / 2), 50):
                     obs_box_pos_list.append((x, y))
 
             for index in range(len(obs_box_pos_list)):
@@ -108,7 +110,7 @@ for e_pos in ellip_pos:
                         ),
                     ),
                     color,
-                    thickness=2,
+                    thickness=-1,
                 )
 
                 image_end = cv2.circle(
@@ -116,9 +118,16 @@ for e_pos in ellip_pos:
                     (obs_box_pos_list[index][0], obs_box_pos_list[index][1]),
                     40,
                     color,
-                    thickness=2,
+                    thickness=-1,
                 )
 
-                print(e_pos[0], e_pos[1], w / 2, h / 2)
+                # print(e_pos[0], e_pos[1], w / 2, h / 2)
                 cv2.imshow(window_name, image_end)
                 cv2.waitKey()
+
+                count += 1
+                # cv2.imwrite(str(count) + ".jpg", image_end)
+                # if count == 2:
+                #     break
+
+# print(count)
